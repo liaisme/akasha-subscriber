@@ -6,7 +6,7 @@ mod vless;
 use crate::{dns, r#type::Error, unwrap_or, Result, User};
 use hysteria2::Hysteria2;
 use serde_yaml_ok::{self as yaml, Mapping};
-use std::{borrow::Cow, collections::HashMap};
+use std::{borrow::Cow, collections::HashMap, net::Ipv6Addr};
 use vless::Vless;
 
 pub struct ClashStyleProxies(Vec<Mapping>);
@@ -61,13 +61,25 @@ impl TryIntoClashStyleProxies for Vec<Mapping> {
             else {
                 continue;
             };
-            for ip in dns::query(&domain, "A")
-                .await?
-                .chain(dns::query(&domain, "AAAA").await?)
-            {
-                let mut proxy = parse_name(proxy.clone(), &ip)?;
-                proxy.insert("server".into(), ip.into());
-                new_proxies.push(proxy);
+
+            async fn resolve(
+                proxy: &Mapping,
+                is_ipv4: bool,
+                new_proxies: &mut Vec<Mapping>,
+                domain: &String,
+            ) -> Result {
+                for ip in dns::query(domain, if is_ipv4 { "A" } else { "AAAA" }).await? {
+                    let mut proxy = parse_name(proxy.clone(), &ip)?;
+                    proxy.insert("server".into(), ip.into());
+                    new_proxies.push(proxy);
+                }
+                Ok(())
+            }
+            if proxy.remove("ipv4").and_then(|ipv4| ipv4.as_bool()) != Some(false) {
+                resolve(&proxy, true, &mut new_proxies, &domain).await?;
+            }
+            if proxy.remove("ipv6").and_then(|ipv6| ipv6.as_bool()) != Some(false) {
+                resolve(&proxy, false, &mut new_proxies, &domain).await?;
             }
         }
         Ok(ClashStyleProxies(new_proxies))
