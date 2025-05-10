@@ -140,7 +140,14 @@ impl TryInto<UrlStyleProxies> for ClashStyleProxies {
     type Error = Error;
     fn try_into(self) -> Result<UrlStyleProxies> {
         let mut urls = vec![];
-        for proxy in self.0 {
+        for mut proxy in self.0 {
+            if let Some(ip) = proxy
+                .get("server")
+                .and_then(|v| v.as_str())
+                .and_then(|s| s.parse::<Ipv6Addr>().ok())
+            {
+                proxy.insert("server".into(), format!("[{ip}]").into());
+            }
             urls.push(
                 match proxy
                     .get("type")
