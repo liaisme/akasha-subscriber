@@ -23,7 +23,9 @@
             lld
             wasm-pack
             binaryen
-            wrangler
+            (wrangler.overrideAttrs (_: {
+              dontCheckForBrokenSymlinks = true;
+            }))
             worker-build
             clippy
             rustfmt
