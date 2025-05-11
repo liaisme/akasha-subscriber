@@ -7,7 +7,6 @@ on:
     paths:
       - src/**
       - Cargo.*
-      - flake.*
       - .github/workflows/deploy.yml
   workflow_dispatch:
 
