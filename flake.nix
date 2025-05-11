@@ -19,16 +19,16 @@
               rustc
               rustLibSrc
               rust-analyzer
+              wasm-pack
+              clippy
+              rustfmt
+              worker-build
             ])
-            lld
-            wasm-pack
-            binaryen
             (wrangler.overrideAttrs (_: {
               dontCheckForBrokenSymlinks = true;
             }))
-            worker-build
-            clippy
-            rustfmt
+            lld
+            wasm-bindgen-cli_0_2_100
             pkg-config
             openssl
           ];
