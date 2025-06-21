@@ -18,6 +18,10 @@ pub struct Reality {
 pub struct Ws {
     pub path: Option<String>,
     pub headers: Option<Headers>,
+    #[serde(rename = "v2ray-http-upgrade")]
+    pub v2ray_http_upgrade: Option<bool>,
+    #[serde(rename = "v2ray-http-upgrade-fast-open")]
+    pub v2ray_http_upgrade_fast_open: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize)]
