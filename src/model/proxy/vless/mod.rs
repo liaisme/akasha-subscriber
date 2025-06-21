@@ -1,10 +1,10 @@
 mod opts;
 
-use opts::{Headers, Reality, Ws};
+use opts::{Headers, Reality, Ws, H2};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::{Deserialize, Serialize};
 
-use crate::model::proxy::tool::{encode, encode_alpn, param};
+use crate::model::proxy::tool::{encode, encode_array, param};
 
 #[derive(Serialize, Deserialize)]
 pub(super) struct Vless {
@@ -21,6 +21,8 @@ pub(super) struct Vless {
     reality_opts: Option<Reality>,
     #[serde(rename = "ws-opts")]
     ws_opts: Option<Ws>,
+    #[serde(rename = "h2-opts")]
+    h2_opts: Option<H2>,
 }
 impl Vless {
     pub(super) fn into_string(self) -> String {
@@ -36,9 +38,9 @@ impl Vless {
             network,
             reality_opts,
             ws_opts,
+            h2_opts,
         } = self;
         let name = utf8_percent_encode(&name, NON_ALPHANUMERIC);
-        let alpn = alpn.map(encode_alpn);
         let (reality_flag, pbk, sid) = match reality_opts {
             Some(Reality {
                 public_key,
@@ -51,7 +53,10 @@ impl Vless {
                 path.map(encode),
                 headers.and_then(|Headers { host }| host.map(encode)),
             ),
-            None => (None, None),
+            None => match h2_opts {
+                Some(H2 { host, path }) => (path.map(encode), host.map(encode_array)),
+                None => (None, None),
+            },
         };
         format!(
             "vless://{uuid}@{server}:{port}{}#{name}",
@@ -65,7 +70,7 @@ impl Vless {
                 flow.map(param("flow")),
                 network.map(param("type")),
                 servername.map(param("sni")),
-                alpn.map(param("alpn")),
+                alpn.map(encode_array).map(param("alpn")),
                 pbk.map(param("pbk")),
                 sid.map(param("sid")),
                 path.map(param("path")),

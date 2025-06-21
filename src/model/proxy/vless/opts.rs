@@ -1,6 +1,12 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub struct H2 {
+    pub host: Option<Vec<String>>,
+    pub path: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct Reality {
     #[serde(rename = "public-key")]
     pub public_key: Option<String>,

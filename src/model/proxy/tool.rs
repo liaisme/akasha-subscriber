@@ -3,8 +3,8 @@ use std::fmt::Display;
 
 const NON_ALPHANUMERIC_EXCEPT_DOT: &AsciiSet = &NON_ALPHANUMERIC.remove(b'.');
 
-pub(super) fn encode_alpn(alpn: Vec<String>) -> String {
-    utf8_percent_encode(&alpn.join(","), NON_ALPHANUMERIC_EXCEPT_DOT).to_string()
+pub(super) fn encode_array(array: Vec<String>) -> String {
+    utf8_percent_encode(&array.join(","), NON_ALPHANUMERIC_EXCEPT_DOT).to_string()
 }
 
 pub(super) fn encode(name: String) -> String {

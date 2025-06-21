@@ -1,7 +1,7 @@
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::{Deserialize, Serialize};
 
-use crate::model::proxy::tool::{encode_alpn, param};
+use crate::model::proxy::tool::{encode_array, param};
 
 #[derive(Serialize, Deserialize)]
 pub(super) struct Hysteria2 {
@@ -40,7 +40,7 @@ impl Hysteria2 {
         } = self;
         let name = utf8_percent_encode(&name, NON_ALPHANUMERIC);
         let skip_cert_verify = skip_cert_verify.map(|flag| flag as u8);
-        let alpn = alpn.map(encode_alpn);
+        let alpn = alpn.map(encode_array);
         let port = port.unwrap_or_else(|| {
             let random_ports: Vec<_> = ports
                 .as_deref()
