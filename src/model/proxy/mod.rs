@@ -1,9 +1,11 @@
+mod anytls;
 mod hysteria2;
 mod impl_trait;
 mod tool;
 mod vless;
 
 use crate::{dns, r#type::Error, unwrap_or, Result, User};
+use anytls::Anytls;
 use hysteria2::Hysteria2;
 use serde_yaml_ok::{self as yaml, Mapping};
 use std::{borrow::Cow, collections::HashMap, net::Ipv6Addr};
@@ -155,6 +157,7 @@ impl TryInto<UrlStyleProxies> for ClashStyleProxies {
                     .expect("Must specify proxy type")
                 {
                     "hysteria2" => Some(yaml::from_value::<Hysteria2>(proxy.into())?.into_string()),
+                    "anytls" => Some(yaml::from_value::<Anytls>(proxy.into())?.into_string()),
                     "vless" => Some(yaml::from_value::<Vless>(proxy.into())?.into_string()),
                     _ => None,
                 },

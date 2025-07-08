@@ -41,6 +41,11 @@ impl User {
                     proxy.insert("password".into(), password.as_str().into());
                 }
             }
+            "anytls" => {
+                if proxy.get("password").is_none() {
+                    proxy.insert("password".into(), self.password.clone().into());
+                }
+            }
             "ss" => {
                 if proxy.get("password").is_none() {
                     if let Some(passwd) = match &*proxy
