@@ -41,32 +41,12 @@ impl Hysteria2 {
         let name = utf8_percent_encode(&name, NON_ALPHANUMERIC);
         let skip_cert_verify = skip_cert_verify.map(|flag| flag as u8);
         let alpn = alpn.map(encode_array);
-        let port = port.unwrap_or_else(|| {
-            let random_ports: Vec<_> = ports
-                .as_deref()
-                .expect("Must provide `port` or `ports`")
-                .replace("/", ",")
-                .split(',')
-                .map(|ports_range| {
-                    let separator = ports_range.find('-');
-                    if let Some(pos) = separator {
-                        let start: u16 =
-                            ports_range[..pos].parse().expect("Invalid `ports` option");
-                        let end: u16 = ports_range[pos + 1..]
-                            .parse()
-                            .expect("Invalid `ports` option");
-                        (start..=end).collect::<Vec<_>>()
-                    } else {
-                        vec![ports_range.parse::<u16>().expect("Invalid `ports` option")]
-                    }
-                })
-                .map(|ports_range| ports_range)
-                .flatten()
-                .collect();
-            random_ports[rand::random_range(0..random_ports.len())]
-        });
+        let ports = ports.map_or_else(
+            || port.map(|port| port.to_string()).unwrap_or_default(),
+            |ports| ports.replace("/", ","),
+        );
         format!(
-            "hysteria2://{password}@{server}:{port}{}#{name}",
+            "hysteria2://{password}@{server}:{ports}{}#{name}",
             match [
                 sni.map(param("sni")),
                 obfs.map(param("obfs")),
