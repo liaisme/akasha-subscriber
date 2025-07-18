@@ -6,3 +6,5 @@ workers_dev = false
 routes = [{ pattern = "sub.vialia.eu.org", custom_domain = true }]
 [build]
 command = "worker-build --release"
+[observability.logs]
+enabled = true
