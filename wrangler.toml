@@ -3,6 +3,6 @@ main = "build/worker/shim.mjs"
 send_metrics = false
 compatibility_date = "2024-10-01"
 workers_dev = false
-routes = [{ pattern = "www.nahida.im/*", zone_name = "nahida.im" }]
+routes = [{ pattern = "sub.vialia.eu.org", custom_domain = true }]
 [build]
 command = "worker-build --release"
